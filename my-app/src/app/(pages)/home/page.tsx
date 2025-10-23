@@ -5,6 +5,9 @@ import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { useAuth, useUser } from '@clerk/nextjs';
 
+// imports start here
+import Dashboard from '../components/dashboard/dashboard';
+
 const DashboardPage = () => {
 
     const { isSignedIn, userId } = useAuth();
@@ -17,7 +20,7 @@ const DashboardPage = () => {
 
     useEffect(() => {
         if (!isLoaded || !userId) return;
-        
+
         const fetchUserData = async () => {
             try {
                 const response = await axios.get('/api/user/', {
@@ -50,9 +53,9 @@ const DashboardPage = () => {
 
     if (isLoading) {
         return (
-            <div className="dashboardComponent">
-                <div className="dashboardComponent-in">
-                    <div className="dashboard-one">
+            <div className="HomeComponent">
+                <div className="HomeComponent-in">
+                    <div className="HomeComponent-one">
                         <p>Loading...</p>
                     </div>
                 </div>
@@ -61,23 +64,13 @@ const DashboardPage = () => {
     }
 
     return (
-        <div className="dashboardComponent">
-            <div className="dashboardComponent-in">
-                <div className="dashboard-one">
-                    {userData && (
-                        <div>
-                            <p>Welcome, {userData.user[0].name}!</p>
-                            <p>Email: {userData.user[0].email}</p>
-                            <p>Provider: {userData.user[0].provider}</p>
-                            <p>username: {userData.user[0].username}</p>
-                        </div>
-                    )}
-                </div>
-                <div className="dashboard-two">
-
+        <Dashboard>
+            <div className="HomeComponent">
+                <div className="HomeComponent-in">
+                     
                 </div>
             </div>
-        </div>
+        </Dashboard>
     )
 }
 
