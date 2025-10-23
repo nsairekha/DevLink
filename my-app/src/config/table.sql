@@ -10,6 +10,7 @@ CREATE TABLE users (
     image_url TEXT,                              -- Profile picture
     provider ENUM('google', 'github', 'clerk') NOT NULL,  -- Auth provider
     username VARCHAR(100) UNIQUE,                -- Unique username for the user
+    bio VARCHAR(80),                             -- User bio (max 80 characters)
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
@@ -18,9 +19,13 @@ CREATE TABLE users (
 CREATE TABLE links (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,                        -- Foreign key to users table
+    link_type ENUM('social', 'project') NOT NULL DEFAULT 'project', -- Type of link
     title VARCHAR(255) NOT NULL,                 -- Title of the link
     url TEXT NOT NULL,                           -- URL of the link
-    icon_url TEXT,                               -- Optional icon URL
+    icon VARCHAR(50),                            -- Icon name (e.g., FaInstagram)
+    is_visible BOOLEAN DEFAULT TRUE,             -- Visibility status
+    clicks INT DEFAULT 0,                        -- Click count
+    display_order INT DEFAULT 0,                 -- Order for displaying links
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
