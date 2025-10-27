@@ -10,7 +10,8 @@ CREATE TABLE users (
     image_url TEXT,                              -- Profile picture
     provider ENUM('google', 'github', 'clerk') NOT NULL,  -- Auth provider
     username VARCHAR(100) UNIQUE,                -- Unique username for the user
-    bio VARCHAR(80),                             -- User bio (max 80 characters)
+    bio VARCHAR(80),                              -- User bio (max 80 characters)
+    is_suspended BOOLEAN DEFAULT FALSE,          -- User suspension status
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
@@ -39,8 +40,15 @@ CREATE TABLE user_themes (
     theme_data JSON NOT NULL,                    -- JSON data for the theme
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-);  
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    background_type ENUM('color', 'gradient', 'image') DEFAULT 'color',
+    background_value VARCHAR(255) DEFAULT '#ffffff',
+    button_style ENUM('fill', 'outline', 'shadow', 'soft-shadow') DEFAULT 'fill',
+    button_color VARCHAR(50) DEFAULT '#000000',
+    button_text_color VARCHAR(50) DEFAULT '#ffffff',
+    font_family VARCHAR(50) DEFAULT 'Inter',
+    theme_preset VARCHAR(50) DEFAULT NULL
+);
 
 -- Indexes for optimization
 CREATE INDEX idx_user_id ON links(user_id);

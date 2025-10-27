@@ -40,6 +40,8 @@ If you already have tables and need to add the new columns:
 mysql -u root -p DevLink < src/config/migration.sql
 ```
 
+**Note:** Theme customization uses the existing `user_themes` table - no additional migration needed!
+
 ## Database Schema
 
 ### Users Table
@@ -51,6 +53,20 @@ mysql -u root -p DevLink < src/config/migration.sql
 - `provider` - Auth provider (google, github, clerk)
 - `username` - Unique username
 - `bio` - User bio (max 80 characters)
+- `created_at` - Timestamp
+- `updated_at` - Timestamp
+
+### User Themes Table
+- `id` - Primary key
+- `user_id` - Foreign key to users
+- `theme_name` - Theme name (e.g., 'custom')
+- `theme_data` - JSON object containing:
+  - `background_type` - Background type (color, gradient, image)
+  - `background_value` - Background value (hex color, gradient CSS, or image path)
+  - `button_style` - Button style (fill, outline, shadow, soft-shadow)
+  - `button_color` - Button background color
+  - `button_text_color` - Button text color
+  - `font_family` - Font family for profile page
 - `created_at` - Timestamp
 - `updated_at` - Timestamp
 
@@ -124,6 +140,45 @@ Update user bio
 }
 ```
 
+### Theme Management
+
+#### GET /api/theme
+Fetch user theme settings
+```
+Query params: userId (Clerk user ID)
+```
+
+#### PUT /api/theme
+Update user theme settings
+```json
+{
+  "clerkUserId": "user_xxx",
+  "background_type": "color|gradient|image",
+  "background_value": "#ffffff",
+  "button_style": "fill|outline|shadow|soft-shadow",
+  "button_color": "#000000",
+  "button_text_color": "#ffffff",
+  "font_family": "Inter"
+}
+```
+
+### Public Profile
+
+#### GET /api/public-profile
+Fetch public profile by username
+```
+Query params: username
+Returns: profile data and visible links
+```
+
+#### POST /api/track-click
+Track link click for analytics
+```json
+{
+  "linkId": "123"
+}
+```
+
 ## Features Implemented
 
 ✅ Create, Read, Update, Delete links
@@ -135,6 +190,9 @@ Update user bio
 ✅ Display order management
 ✅ Automatic data fetching on page load
 ✅ Real-time updates with database sync
+✅ **Theme customization** (backgrounds, button styles, colors, fonts)
+✅ **Public profile pages** (shareable at /[username])
+✅ **Link click analytics**
 
 ## Testing the Setup
 

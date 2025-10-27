@@ -78,7 +78,7 @@ const page = () => {
             });
 
             if (response.status === 200) {
-               router.push('/dashboard');           
+               router.push('/home');           
             }
         } catch (error) {
             console.log("Error creating profile:", error);

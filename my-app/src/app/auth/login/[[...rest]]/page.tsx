@@ -23,7 +23,9 @@ export default function Page() {
                   headerSubtitle: 'text-gray-600',
                 }
               }}
-              redirectUrl="/dashboard"
+              redirectUrl="/home"
+              routing="path"
+              path="/auth/login"
             />
           </div>
         </div>
