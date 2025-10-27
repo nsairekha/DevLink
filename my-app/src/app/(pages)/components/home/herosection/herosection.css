@@ -1,0 +1,60 @@
+*{
+    padding: 0%;
+    margin: 0%;
+    box-sizing: border-box;
+}
+
+.herosection-home{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    /* background-color: yellowgreen; */
+    width: 100%;
+    /* padding: 16.7rem; */
+}
+
+.herosection-home-in{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    width: 100%;
+    /* background-color: lightgray; */
+}
+
+.herosection-home-in-hero{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    gap: 1rem;
+    /* background-color: lightpink; */
+}
+.herosection-home-in-one {
+    width: 60%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    padding: 21.9vh;
+    /* background-color: aqua; */
+}
+
+.herosection-home-in-one-a h1{
+    font-size: 2rem;
+    padding: 1rem;
+}
+.herosection-home-in-one-b p{
+    font-size: 1.5rem;
+    padding: 1rem;
+}
+
+.herosection-home-in-two {
+    width: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* background-color: coral; */
+}
+
