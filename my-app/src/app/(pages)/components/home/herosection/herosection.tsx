@@ -2,6 +2,8 @@ import React from "react";
 import next  from "next";
 import "./herosection.css";
 import Navbar from "../navbar/nav";
+import heroimg from "../../../../../../assests/heroimg.png";
+import Image from "next/image";
 
 const HeroSection =() => {
     return (
@@ -25,7 +27,13 @@ const HeroSection =() => {
                     </div> */}
                 </div>
                 <div className="herosection-home-in-two">
-                    <h1>hello</h1>
+                    <Image  src="/assets/heroimg.png"
+                      src="/assets/heroimg.png"
+                      alt="Hero"
+                      width={500}
+                      height={500}
+                      priority
+                    />
                 </div>
                 </div>
             </div>
