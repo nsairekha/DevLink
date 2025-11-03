@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-// import Navbar from "./(pages)/components/home/navbar/nav";
+
 import HeroSection from "./(pages)/components/home/herosection/herosection"; 
 
 export default function Home() {

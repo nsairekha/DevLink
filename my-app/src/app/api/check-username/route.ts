@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { pool } from "@/config/db"
 
-export const POST = async (req: NextRequest, res: NextResponse) => {
+export const POST = async (req: NextRequest) => {
     try {
-
         const { username } = await req.json();
 
         const [rows] = await pool.query("SELECT * FROM users WHERE username = ?", [username]);

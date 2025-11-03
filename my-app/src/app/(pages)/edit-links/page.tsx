@@ -81,14 +81,22 @@ const EditLinks = () => {
   const [newLinkTitle, setNewLinkTitle] = useState('');
   const [newLinkUrl, setNewLinkUrl] = useState('');
   const [bio, setBio] = useState('');
+  const [bioOriginal, setBioOriginal] = useState('');
   const [showBioInput, setShowBioInput] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [imageUrl, setImageUrl] = useState('');
+  const [originalImageUrl, setOriginalImageUrl] = useState('');
+  const [savingImage, setSavingImage] = useState(false);
+  const [showPhotoControls, setShowPhotoControls] = useState(false);
+  const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
+  const [imageError, setImageError] = useState<string | null>(null);
 
   // Fetch user's links and bio on component mount
   useEffect(() => {
     if (user?.id) {
       fetchLinks();
       fetchBio();
+      fetchUserImage();
     }
   }, [user?.id]);
 
@@ -106,10 +114,75 @@ const EditLinks = () => {
   const fetchBio = async () => {
     try {
       const response = await axios.get(`/api/bio?userId=${user?.id}`);
-      setBio(response.data.bio || '');
+      const fetchedBio = response.data.bio || '';
+      setBio(fetchedBio);
+      setBioOriginal(fetchedBio);
     } catch (error) {
       console.error('Error fetching bio:', error);
     }
+  };
+
+  const fetchUserImage = async () => {
+    try {
+      const response = await axios.get(`/api/user?userId=${user?.id}`);
+      const rows = (response.data.user as any[]) || [];
+      const row = rows[0];
+      const current = row?.image_url || user?.imageUrl || '';
+      setImageUrl(current);
+      setOriginalImageUrl(current);
+    } catch (error) {
+      console.error('Error fetching user image:', error);
+      const fallback = user?.imageUrl || '';
+      setImageUrl(fallback);
+      setOriginalImageUrl(fallback);
+    }
+  };
+
+  const handleSelectFile = async (file: File) => {
+    if (!user?.id) return;
+    try {
+      setImageError(null);
+      setSelectedFileName(file.name);
+      const fd = new FormData();
+      fd.append('file', file);
+      fd.append('clerkUserId', user.id);
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: fd,
+      });
+      if (!res.ok) throw new Error('Upload failed');
+      const data = await res.json();
+      setImageUrl(data.url);
+    } catch (e) {
+      console.error('Upload failed:', e);
+      setImageError('Upload failed. Please try a smaller JPG/PNG/WebP (max 5MB).');
+    }
+  };
+
+  const handleSaveImage = async () => {
+    if (!user?.id) return;
+    try {
+      setSavingImage(true);
+      await axios.put('/api/user', {
+        clerkUserId: user.id,
+        imageUrl,
+      });
+      setOriginalImageUrl(imageUrl);
+      setShowPhotoControls(false);
+      setSelectedFileName(null);
+    } catch (error) {
+      console.error('Error saving profile photo:', error);
+      setImageError('Failed to save profile photo.');
+    } finally {
+      setSavingImage(false);
+    }
+  };
+
+  const handleCancelImageChanges = () => {
+    setImageUrl(originalImageUrl);
+    setSelectedFileName(null);
+    setImageError(null);
+    setShowPhotoControls(false);
   };
 
   const handleAddLink = () => {
@@ -235,11 +308,17 @@ const EditLinks = () => {
         clerkUserId: user?.id,
         bio,
       });
+      setBioOriginal(bio);
       setShowBioInput(false);
     } catch (error) {
       console.error('Error saving bio:', error);
       alert('Failed to save bio. Please try again.');
     }
+  };
+
+  const handleCancelBio = () => {
+    setBio(bioOriginal);
+    setShowBioInput(false);
   };
 
   return (
@@ -250,22 +329,89 @@ const EditLinks = () => {
           <div className="edit-links-content">
             {/* Header Section - Profile Info */}
             <div className="profile-header">
-              <div className="avatar-placeholder" style={{
-                backgroundImage: user?.imageUrl ? `url(${user.imageUrl})` : undefined,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center'
-              }}></div>
-              <div className="profile-info">
+              <div style={{ position: 'relative', width: 88, height: 88 }}>
+                <div
+                  className="avatar-placeholder"
+                  style={{
+                    backgroundImage: imageUrl ? `url(${imageUrl})` : undefined,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    width: 88,
+                    height: 88,
+                    borderRadius: '9999px',
+                  }}
+                ></div>
+                <button
+                  aria-label="Edit photo"
+                  onClick={() => setShowPhotoControls((s) => !s)}
+                  style={{
+                    position: 'absolute',
+                    right: -6,
+                    bottom: -6,
+                    height: 32,
+                    padding: '0 10px',
+                    borderRadius: 16,
+                    border: '1px solid #e5e7eb',
+                    background: '#fff',
+                    boxShadow: '0 1px 2px rgba(0,0,0,0.06)',
+                    cursor: 'pointer',
+                    fontSize: 12,
+                  }}
+                >
+                  Edit
+                </button>
+              </div>
+              <div className="profile-info" style={{ minWidth: 0 }}>
                 <h2 className="username">{user?.username || user?.firstName || 'User'}</h2>
+
+                {showPhotoControls && (
+                  <div
+                    className="photo-controls"
+                    style={{
+                      display: 'flex',
+                      flexWrap: 'wrap',
+                      gap: '0.5rem',
+                      alignItems: 'center',
+                      marginTop: '0.25rem',
+                    }}
+                  >
+                    <input
+                      type="url"
+                      className="form-input"
+                      placeholder="Image URL (optional)"
+                      value={imageUrl}
+                      onChange={(e) => setImageUrl(e.target.value)}
+                      style={{ maxWidth: 360 }}
+                    />
+                    <button
+                      className="save-button"
+                      onClick={handleSaveImage}
+                      disabled={savingImage || imageUrl === originalImageUrl}
+                    >
+                      {savingImage ? 'Saving...' : 'Save Photo'}
+                    </button>
+                    <button className="cancel-button" onClick={handleCancelImageChanges}>
+                      Cancel
+                    </button>
+                    <div style={{ width: '100%', fontSize: 12, color: '#6b7280' }}>
+                      {selectedFileName ? `Selected: ${selectedFileName}` : 'Max 5MB · JPG/PNG/WebP'}
+                    </div>
+                    {imageError && (
+                      <div style={{ width: '100%', fontSize: 12, color: '#b91c1c' }}>{imageError}</div>
+                    )}
+                  </div>
+                )}
+
                 {!showBioInput ? (
-                  <p 
-                    className="add-bio" 
+                  <p
+                    className="add-bio"
+                    style={{ marginTop: 8 }}
                     onClick={() => setShowBioInput(true)}
                   >
                     {bio || 'Add bio'}
                   </p>
                 ) : (
-                  <div className="bio-input-container">
+                  <div className="bio-input-container" style={{ marginTop: 8 }}>
                     <textarea
                       className="bio-input"
                       placeholder="Tell your story..."
@@ -275,22 +421,25 @@ const EditLinks = () => {
                       rows={2}
                       autoFocus
                     />
-                    <div className="bio-actions">
-                      <span className="bio-char-count">{bio.length}/80</span>
-                      <button className="bio-save-btn" onClick={handleBioSave}>
+                    <div className="bio-actions" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <span className="bio-char-count" style={{ marginRight: 'auto', color: '#6b7280' }}>
+                        {bio.length}/80
+                      </span>
+                      <button
+                        className="bio-save-btn"
+                        onClick={handleBioSave}
+                        disabled={bio === bioOriginal}
+                      >
                         Save
                       </button>
+                      <button className="cancel-button" onClick={handleCancelBio}>Cancel</button>
                     </div>
                   </div>
                 )}
               </div>
             </div>
 
-            {/* Main Add Button */}
-            <button className="add-button" onClick={handleAddLink}>
-              <span className="plus-icon">+</span>
-              <span>Add Link</span>
-            </button>
+         
 
             {/* Display Links */}
             {loading ? (

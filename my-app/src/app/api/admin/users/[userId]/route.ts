@@ -5,9 +5,10 @@ import { pool } from "@/config/db";
 // DELETE - Delete a user and all their data
 export async function DELETE(
     req: NextRequest,
-    { params }: { params: { userId: string } }
+    props: { params: Promise<{ userId: string }> }
 ) {
     try {
+        const params = await props.params;
         const { userId: adminUserId } = await auth();
 
         if (!adminUserId) {
@@ -42,9 +43,10 @@ export async function DELETE(
 // PATCH - Update user suspend status
 export async function PATCH(
     req: NextRequest,
-    { params }: { params: { userId: string } }
+    props: { params: Promise<{ userId: string }> }
 ) {
     try {
+        const params = await props.params;
         const { userId: adminUserId } = await auth();
 
         if (!adminUserId) {

@@ -8,12 +8,17 @@
     width: 100%;
     height: 100vh;
     display: flex;
+    background: var(--bg-base);
 }
 
 .dashboard-one {
-    width: 18%;
+    width: 280px;
+    flex-shrink: 0;
 }
 
 .dashboard-two {
-    width: 82%;
+    flex: 1;
+    min-width: 0;
+    overflow: auto;
+    background: linear-gradient(180deg, var(--bg-base), var(--bg-secondary));
 }

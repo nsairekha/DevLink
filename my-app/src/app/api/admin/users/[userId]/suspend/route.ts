@@ -5,9 +5,10 @@ import { pool } from "@/config/db";
 // PATCH - Update user suspend status
 export async function PATCH(
     req: NextRequest,
-    { params }: { params: { userId: string } }
+    props: { params: Promise<{ userId: string }> }
 ) {
     try {
+        const params = await props.params;
         const { userId: adminUserId } = await auth();
 
         if (!adminUserId) {

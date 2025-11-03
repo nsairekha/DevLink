@@ -1,0 +1,27 @@
+.analytics-container { padding: 24px; display: flex; flex-direction: column; gap: 20px; }
+.analytics-header { display: flex; justify-content: space-between; align-items: center; }
+.header-content { display: flex; width: 100%; justify-content: space-between; align-items: center; }
+.header-actions { display: flex; gap: 12px; align-items: center; }
+.date-range-select { padding: 8px 12px; border: 1px solid #e5e7eb; border-radius: 8px; background: #fff; }
+.analytics-summary { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+.summary-card { background: #fff; border: 1px solid #f1f5f9; border-radius: 12px; padding: 16px; display: flex; gap: 12px; align-items: center; }
+.summary-icon { width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+.summary-label { color: #64748b; font-size: 12px; margin: 0; }
+.summary-value { margin: 2px 0 0; }
+.analytics-charts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.chart-card { background: #fff; border: 1px solid #f1f5f9; border-radius: 12px; padding: 16px; }
+.chart-card-small { grid-column: span 1; }
+.chart-container { height: 280px; }
+.analytics-table { background: #fff; border: 1px solid #f1f5f9; border-radius: 12px; padding: 16px; }
+.table-wrapper { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; }
+th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid #f1f5f9; }
+.rank-badge { background: #0ea5e9; color: #fff; padding: 4px 8px; border-radius: 9999px; font-size: 12px; }
+.username-link { color: #2563eb; text-decoration: none; }
+.no-username { color: #94a3b8; }
+.clicks-count { font-weight: 600; }
+.analytics-loading { padding: 48px; display: flex; flex-direction: column; gap: 12px; align-items: center; justify-content: center; }
+.loading-spinner { width: 28px; height: 28px; border: 3px solid #e5e7eb; border-top-color: #3b82f6; border-radius: 9999px; animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (max-width: 960px) { .analytics-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); } .analytics-charts { grid-template-columns: 1fr; } }
+

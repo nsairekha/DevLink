@@ -5,7 +5,7 @@ import Dashboard from '../components/dashboard/dashboard';
 import './page.css';
 import { useUser } from '@clerk/nextjs';
 import axios from 'axios';
-import { FaPalette, FaImage, FaFont, FaSquare, FaCheck, FaLink as FaLinkIcon, FaCopy } from 'react-icons/fa';
+import { FaPalette, FaImage, FaFont, FaSquare, FaCheck, FaLink as FaLinkIcon, FaCopy, FaQrcode, FaDownload } from 'react-icons/fa';
 
 interface ThemeSettings {
   background_type: 'color' | 'gradient' | 'image';
@@ -67,6 +67,9 @@ const ThemePage = () => {
   const [username, setUsername] = useState('');
   const [copied, setCopied] = useState(false);
   const [profileUrl, setProfileUrl] = useState('');
+  const [showQR, setShowQR] = useState(false);
+  const [qrCode, setQrCode] = useState('');
+  const [loadingQR, setLoadingQR] = useState(false);
   const [theme, setTheme] = useState<ThemeSettings>({
     background_type: 'color',
     background_value: '#ffffff',
@@ -146,6 +149,38 @@ const ThemePage = () => {
     }
   };
 
+  const handleGenerateQR = async () => {
+    if (!username) {
+      alert('Please set a username in your profile first!');
+      return;
+    }
+    
+    setLoadingQR(true);
+    try {
+      const response = await axios.get('/api/qrcode', {
+        params: { username, size: 400 }
+      });
+      setQrCode(response.data.qrCode);
+      setShowQR(true);
+    } catch (error) {
+      console.error('Error generating QR code:', error);
+      alert('Failed to generate QR code');
+    } finally {
+      setLoadingQR(false);
+    }
+  };
+
+  const handleDownloadQR = () => {
+    if (!qrCode) return;
+    
+    const link = document.createElement('a');
+    link.href = qrCode;
+    link.download = `${username}-qr-code.png`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   if (loading) {
     return (
       <Dashboard>
@@ -173,17 +208,26 @@ const ThemePage = () => {
                   <p className="theme-subtitle">Make your profile page unique</p>
                 </div>
                 {username && (
-                  <button className="copy-link-btn" onClick={handleCopyLink}>
-                    {copied ? (
-                      <>
-                        <FaCheck /> Copied!
-                      </>
-                    ) : (
-                      <>
-                        <FaCopy /> Copy Profile Link
-                      </>
-                    )}
-                  </button>
+                  <div className="header-actions">
+                    <button className="copy-link-btn" onClick={handleCopyLink}>
+                      {copied ? (
+                        <>
+                          <FaCheck /> Copied!
+                        </>
+                      ) : (
+                        <>
+                          <FaCopy /> Copy Link
+                        </>
+                      )}
+                    </button>
+                    <button 
+                      className="qr-btn" 
+                      onClick={handleGenerateQR}
+                      disabled={loadingQR}
+                    >
+                      <FaQrcode /> {loadingQR ? 'Generating...' : 'QR Code'}
+                    </button>
+                  </div>
                 )}
               </div>
               {username && profileUrl && (
@@ -357,6 +401,25 @@ const ThemePage = () => {
               {saving ? 'Saving...' : 'Save Theme'}
             </button>
           </div>
+
+          {/* QR Code Modal */}
+          {showQR && qrCode && (
+            <div className="qr-modal-overlay" onClick={() => setShowQR(false)}>
+              <div className="qr-modal" onClick={(e) => e.stopPropagation()}>
+                <div className="qr-modal-header">
+                  <h3>Your Profile QR Code</h3>
+                  <button className="qr-close" onClick={() => setShowQR(false)}>×</button>
+                </div>
+                <div className="qr-modal-body">
+                  <img src={qrCode} alt="Profile QR Code" className="qr-image" />
+                  <p className="qr-url">{profileUrl}</p>
+                  <button className="qr-download-btn" onClick={handleDownloadQR}>
+                    <FaDownload /> Download QR Code
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Right Side - Preview */}
           <div className="theme-preview">
